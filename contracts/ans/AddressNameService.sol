@@ -4,6 +4,7 @@ import "./IANSStorage.sol";
 import "../lib/Ownable.sol";
 import "../lib/Utils.sol";
 
+/// @title Address Name Service contract
 contract AddressNameService is IANSStorage, Ownable {
     modifier validAddress(address _address) {
         require(_address != address(0), "Requires valid address.");
