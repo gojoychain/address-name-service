@@ -38,7 +38,7 @@ contract ANSStorage is IANSStorage, Ownable {
 
     /// @param name Name to resolve to an address.
     /// @return Address associated with the name.
-    function resolveName(bytes32 name) external view returns (address resolvedAddress) {
+    function resolveName(bytes32 name) external view returns (address resolved) {
         return _nameRecords[name];
     }
 
