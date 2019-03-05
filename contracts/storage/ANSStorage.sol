@@ -21,7 +21,7 @@ contract ANSStorage is IANSStorage, Ownable {
     ///      Only the owner of this contract can call this.
     /// @param name Name to add a name record for. 
     /// @return True if the assignment succeeds.
-    function assignName(bytes32 name) external onlyOwner returns (bool success) {
+    function assignName(bytes32 name) external returns (bool success) {
         _nameRecords[name] = msg.sender;
         return true;
     }
