@@ -14,7 +14,7 @@ contract ANSStorage is IANSStorage, Ownable {
     }
 
     /// @param owner Owner of the contract.
-    constructor(address owner) Ownable(owner) external validAddress(owner) {
+    constructor(address owner) Ownable(owner) public validAddress(owner) {
     }
 
     /// @dev Note the validation of the name should happen in the library contract.
