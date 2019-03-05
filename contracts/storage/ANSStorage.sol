@@ -5,42 +5,46 @@ import "../lib/Ownable.sol";
 
 /// @title Address Name Service Storage contract
 contract ANSStorage is IANSStorage, Ownable {
-    function assignName(
-        bytes32 name) 
-        external 
-        onlyOwner
-        returns (bool success) 
-    {
+    mapping(bytes32 => address) private _nameRecords;
+    mapping(address => uint8) private _nameMinLimits;
+
+    modifier validAddress(address _address) {
+        require(_address != address(0), "Requires valid address.");
+        _;
+    }
+
+    /// @param owner Owner of the contract.
+    constructor(address owner) Ownable(owner) external validAddress(owner) {
+    }
+
+    /// @dev Note the validation of the name should happen in the library contract.
+    ///      Only the owner of this contract can call this.
+    /// @param name Name to add a name record for. 
+    /// @return True if the assignment succeeds.
+    function assignName(bytes32 name) external onlyOwner returns (bool success) {
         _nameRecords[name] = msg.sender;
         return true;
     }
 
-    function setMinLimit(
-        address addr,
-        uint8 limit)
-        external
-        onlyOwner
-        returns (bool success)
-    {
+    /// @dev Validation should happen in the library contract.
+    ///      Only the owner of this contract can call this.
+    /// @param addr Address to set the limit on.
+    /// @param limit Minimum length of any future added name records.
+    /// @return True if setting the limit succeeds.
+    function setMinLimit(address addr, uint8 limit) external onlyOwner returns (bool success) {
         _nameMinLimits[addr] = limit;
         return true;
     }
 
-    function resolveName(
-        bytes32 name) 
-        external 
-        view 
-        returns (address resolvedAddress)
-    {
+    /// @param name Name to resolve to an address.
+    /// @return Address associated with the name.
+    function resolveName(bytes32 name) external view returns (address resolvedAddress) {
         return _nameRecords[name];
     }
 
-    function getMinLimit(
-        address addr) 
-        external 
-        view 
-        returns (uint8 limit) 
-    {
+    /// @param addr Address to find the min limit for.
+    /// @return Min limit of name length.
+    function getMinLimit(address addr) external view returns (uint8 limit) {
         return _nameMinLimits[addr];
     }
 }

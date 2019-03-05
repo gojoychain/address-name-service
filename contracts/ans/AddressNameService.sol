@@ -1,16 +1,10 @@
 pragma solidity ^0.5.4;
 
-import "./IANSStorage.sol";
-import "../lib/Ownable.sol";
+import "./IAddressNameService.sol";
 import "../lib/Utils.sol";
 
-/// @title Address Name Service contract
-contract AddressNameService is IANSStorage, Ownable {
-    modifier validAddress(address _address) {
-        require(_address != address(0), "Requires valid address.");
-        _;
-    }
-
+/// @title Address Name Service library
+library AddressNameService is IAddressNameService {
     function setMinLimit(
         address addr,
         uint8 minLimit)
