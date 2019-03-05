@@ -1,13 +1,14 @@
 pragma solidity ^0.5.4;
 
 contract IANSStorage {
-    struct NameRecord {
+    struct AddressRecord {
         bytes32[] _names;
         uint8 _limit;
     }
 
-    mapping(bytes32 => NameRecord) internal _nameRecords;
+    mapping(address => AddressRecord) internal _addressRecords;
 
-    function addNameRecord(bytes32 name) external returns (bool success);
+    function assignName(bytes32 name) external returns (bool success);
+    function setLimit(uint8 newLimit) external returns (bool success);
     function resolveName(bytes32 name) external view returns (address resolvedAddress);
 }
