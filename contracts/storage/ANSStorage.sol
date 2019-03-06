@@ -34,6 +34,7 @@ contract ANSStorage is IANSStorage, Ownable {
     /// @return True if setting the limit succeeds.
     function setMinLimit(address addr, uint8 limit) external onlyOwner returns (bool success) {
         _nameMinLimits[addr] = limit;
+        emit NameLimitSet(addr, limit);
         return true;
     }
 

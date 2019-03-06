@@ -11,57 +11,45 @@ const ANSWrapper = artifacts.require('ANSWrapper')
 const web3 = global.web3
 
 contract('ANSWrapper', (accounts) => {
-  const { OWNER, ACCT1, ACCT2, INVALID_ADDR, MAX_GAS } = getConstants(accounts)
+  const { OWNER, INVALID_ADDR, MAX_GAS } = getConstants(accounts)
   const timeMachine = new TimeMachine(web3)
   
-  let storage, storageAddr
-  let ansLib, ansLibAddr
   let ansWrap, ansWrapAddr
+  let storage, storageAddr
   let wrapMethods
 
   beforeEach(timeMachine.snapshot)
   afterEach(timeMachine.revert)
 
   beforeEach(async () => {
-    storage = await ANSStorage.deployed(OWNER, { from: OWNER, gas: MAX_GAS })
-    storageAddr = storage.contract._address
-    
-    ansLib = await ANS.deployed({ from: OWNER, gas: MAX_GAS })
-    ansLibAddr = ansLib.contract._address
-
-    ansWrap = await ANSWrapper.deployed({ from: OWNER, gas: MAX_GAS })
+    ansWrap = await ANSWrapper.new({ from: OWNER, gas: MAX_GAS })
     ansWrapAddr = ansWrap.contract._address
 
+    storage = await ANSStorage.new(ansWrapAddr, { from: OWNER, gas: MAX_GAS })
+    storageAddr = storage.contract._address
+    
     wrapMethods = ansWrap.contract.methods
-
-    console.log('storage', storageAddr)
-    console.log('ansLib', ansLibAddr)
-    console.log('ansWrap', ansWrapAddr)
-    console.log('owner', OWNER)
   })
   
   describe('assignName', () => {
     it('assigns the name', async () => {
       const name = '12345678'
-      await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
-      assert.equal(await wrapMethods.resolveName(storageAddr, name).call(), ansWrapAddr)
-    })
-
-    // TODO: expected failing. need to figure out delegatecall with wrapper contract.
-    it('uses the assigned min limit', async () => {
-      await wrapMethods.setMinLimit(ansLibAddr, storageAddr, ansWrapAddr, 1).send({ from: OWNER, gas: 100000 })
-
-      const name = '1'
-      assert.equal(name.length, 1)
-
-      await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
-      assert.equal(await wrapMethods.resolveName(storageAddr, name).call(), ansWrapAddr)
+      await wrapMethods.assignName(storageAddr, name)
+        .send({ from: OWNER, gas: 100000 })
+      assert.equal(
+        await wrapMethods.resolveName(storageAddr, name).call(), 
+        ansWrapAddr,
+      )
     })
 
     it('converts the name to lowercase', async () => {
       const name = 'ABCDEFGH'
-      await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
-      assert.equal(await wrapMethods.resolveName(storageAddr, name).call(), ansWrapAddr)
+      await wrapMethods.assignName(storageAddr, name)
+        .send({ from: OWNER, gas: 100000 })
+      assert.equal(
+        await wrapMethods.resolveName(storageAddr, name).call(), 
+        ansWrapAddr,
+      )
     })
 
     it('throws if storageAddress is not valid', async () => {
@@ -69,7 +57,8 @@ contract('ANSWrapper', (accounts) => {
       assert.equal(name.length, 7)
 
       try {
-        await wrapMethods.assignName(INVALID_ADDR, name).send({ from: OWNER, gas: 100000 })
+        await wrapMethods.assignName(INVALID_ADDR, name)
+          .send({ from: OWNER, gas: 100000 })
       } catch (err) {
         sassert.revert(err)
       }
@@ -80,7 +69,8 @@ contract('ANSWrapper', (accounts) => {
       assert.equal(name.length, 7)
 
       try {
-        await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+        await wrapMethods.assignName(storageAddr, name)
+          .send({ from: OWNER, gas: 100000 })
       } catch (err) {
         sassert.revert(err)
       }
@@ -91,7 +81,8 @@ contract('ANSWrapper', (accounts) => {
       assert.equal(name.length, 21)
 
       try {
-        await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+        await wrapMethods.assignName(storageAddr, name)
+          .send({ from: OWNER, gas: 100000 })
       } catch (err) {
         sassert.revert(err)
       }
@@ -101,7 +92,8 @@ contract('ANSWrapper', (accounts) => {
       const name = '0x1234567890'
 
       try {
-        await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+        await wrapMethods.assignName(storageAddr, name)
+          .send({ from: OWNER, gas: 100000 })
       } catch (err) {
         sassert.revert(err)
       }
@@ -110,11 +102,60 @@ contract('ANSWrapper', (accounts) => {
     it('throws if the name is taken', async () => {
       const name = '1234567890'
 
-      await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
-      assert.equal(await wrapMethods.resolveName(storageAddr, name).call(), ansWrapAddr)
+      await wrapMethods.assignName(storageAddr, name)
+        .send({ from: OWNER, gas: 100000 })
+      assert.equal(
+        await wrapMethods.resolveName(storageAddr, name).call(), 
+        ansWrapAddr,
+      )
 
       try {
-        await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+        await wrapMethods.assignName(storageAddr, name)
+          .send({ from: OWNER, gas: 100000 })
+      } catch (err) {
+        sassert.revert(err)
+      }
+    })
+  })
+  
+  describe('setMinLimit', () => {
+    // TODO: expected fail. assignName after setMinLimit not getting the set limit.
+    // something with msg.sender calling from ANSWrapper is not same address.
+    it('sets the name min limit of an address', async () => {
+      await wrapMethods.setMinLimit(storageAddr, ansWrapAddr, 1)
+        .send({ from: OWNER, gas: 100000 })
+
+      const name = '1'
+      assert.equal(name.length, 1)
+
+      await wrapMethods.assignName(storageAddr, name)
+        .send({ from: OWNER, gas: 100000 })
+      assert.equal(
+        await wrapMethods.resolveName(storageAddr, name).call(), 
+        ansWrapAddr,
+      )
+    })
+
+    it('throws if storageAddress is not valid', async () => {
+      try {
+        await wrapMethods.setMinLimit(storageAddr, ansWrapAddr, 1)
+          .send({ from: OWNER, gas: 100000 })
+      } catch (err) {
+        sassert.revert(err)
+      }
+    })
+
+    it('throws if the minLimit is not within the allowable range', async () => {
+      try {
+        await wrapMethods.setMinLimit(storageAddr, ansWrapAddr, 0)
+          .send({ from: OWNER, gas: 100000 })
+      } catch (err) {
+        sassert.revert(err)
+      }
+
+      try {
+        await wrapMethods.setMinLimit(storageAddr, ansWrapAddr, 9)
+          .send({ from: OWNER, gas: 100000 })
       } catch (err) {
         sassert.revert(err)
       }
@@ -124,21 +165,30 @@ contract('ANSWrapper', (accounts) => {
   describe('resolveName', () => {
     it('resolves the name', async () => {
       const name = '12345678'
-      await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
-      assert.equal(await wrapMethods.resolveName(storageAddr, name).call(), ansWrapAddr)
+      await wrapMethods.assignName(storageAddr, name)
+        .send({ from: OWNER, gas: 100000 })
+      assert.equal(
+        await wrapMethods.resolveName(storageAddr, name).call(), 
+        ansWrapAddr,
+      )
     })
 
     it('converts the name to lowercase', async () => {
       let name = 'abcdefgh'
-      await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+      await wrapMethods.assignName(storageAddr, name)
+        .send({ from: OWNER, gas: 100000 })
 
       name = 'ABCDEFGH'
-      assert.equal(await wrapMethods.resolveName(storageAddr, name).call(), ansWrapAddr)
+      assert.equal(
+        await wrapMethods.resolveName(storageAddr, name).call(),
+        ansWrapAddr,
+      )
     })
 
     it('throws if storageAddress is not valid', async () => {
       const name = '12345678'
-      await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+      await wrapMethods.assignName(storageAddr, name)
+        .send({ from: OWNER, gas: 100000 })
       try {
         await wrapMethods.resolveName(INVALID_ADDR, name).call()
       } catch (err) {
