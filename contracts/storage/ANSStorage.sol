@@ -23,6 +23,7 @@ contract ANSStorage is IANSStorage, Ownable {
     /// @return True if the assignment succeeds.
     function assignName(bytes32 name) external returns (bool success) {
         _nameRecords[name] = msg.sender;
+        emit NameAssigned(name, msg.sender);
         return true;
     }
 

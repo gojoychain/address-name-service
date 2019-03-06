@@ -14,11 +14,9 @@ contract('ANSWrapper', (accounts) => {
   const { OWNER, ACCT1, ACCT2, INVALID_ADDR, MAX_GAS } = getConstants(accounts)
   const timeMachine = new TimeMachine(web3)
   
-  let storage
-  let storageAddr
-  let ansLib
-  let ansLibAddr
-  let ansWrap
+  let storage, storageAddr
+  let ansLib, ansLibAddr
+  let ansWrap, ansWrapAddr
 
   beforeEach(async () => {
     await timeMachine.snapshot
@@ -30,6 +28,11 @@ contract('ANSWrapper', (accounts) => {
     ansLibAddr = ansLib.contract._address
 
     ansWrap = await ANSWrapper.deployed({ from: OWNER, gas: MAX_GAS })
+    ansWrapAddr = ansWrap.contract._address
+
+    console.log('storage', storageAddr)
+    console.log('ansLib', ansLibAddr)
+    console.log('ansWrap', ansWrapAddr)
   })
   
   afterEach(async () => {
@@ -37,17 +40,13 @@ contract('ANSWrapper', (accounts) => {
   })
 
   describe('assignName', () => {
-    it.only('throws if the name is not longer than the min limit', async () => {
-      console.log(storageAddr)
-      console.log(ansLibAddr)
-      console.log(ansWrap)
+    it.only('assigns the name', async () => {
       const name = web3.utils.asciiToHex('a')
-      console.log(name)
-      // try {
-        await ansWrap.contract.methods.assignName(ansLibAddr, storageAddr, name).send({ from: ACCT1, gas: 2000000 })
-      // } catch (err) {
-        // sassert.revert(err)
-      // }
+      await ansWrap.contract.methods.assignName(ansLibAddr, storageAddr, name).send({ from: OWNER, gas: 2000000 })
+      assert.equal(
+        await ansWrap.contract.methods.resolveName(ansLibAddr, storageAddr, name).call({ from: OWNER }),
+        ansWrapAddr,
+      )
     })
   })
 })

@@ -29,13 +29,13 @@ library ANS {
 
         // Checks
         bytes memory nameBytes = Utils.toBytes(name);
-        require(nameBytes.length >= minLimit, "name must be longer than min length.");
-        require(nameBytes.length <= NAME_MAX_LIMIT, "name must be shorter than max length.");
+        // require(nameBytes.length >= minLimit, "name must be longer than min length.");
+        // require(nameBytes.length <= NAME_MAX_LIMIT, "name must be shorter than max length.");
         require(name[0] != 0x30 && name[1] != 0x78, "name cannot be a hex string.");
         require(IANSStorage(storageAddress).resolveName(name) == address(0), "name is already taken");
 
         // Convert to lowercase
-        nameBytes = Utils.toLower(nameBytes);
+        nameBytes = Utils.toLower(nameBytes);   
         bytes32 lowerName = Utils.toBytes32(nameBytes, 0);
 
         // Call storage contract and assign the name
