@@ -18,9 +18,10 @@ contract('ANSWrapper', (accounts) => {
   let ansLib, ansLibAddr
   let ansWrap, ansWrapAddr
 
+  beforeEach(timeMachine.snapshot)
+  afterEach(timeMachine.revert)
+
   beforeEach(async () => {
-    await timeMachine.snapshot
-    
     storage = await ANSStorage.deployed(OWNER, { from: OWNER, gas: MAX_GAS })
     storageAddr = storage.contract._address
     
@@ -35,10 +36,6 @@ contract('ANSWrapper', (accounts) => {
     console.log('ansWrap', ansWrapAddr)
   })
   
-  afterEach(async () => {
-    await timeMachine.revert
-  })
-
   describe('assignName', () => {
     it('assigns the name', async () => {
       const name = 'a'
