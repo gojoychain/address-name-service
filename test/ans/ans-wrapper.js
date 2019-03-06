@@ -40,13 +40,18 @@ contract('ANSWrapper', (accounts) => {
   })
 
   describe('assignName', () => {
-    it.only('assigns the name', async () => {
-      const name = web3.utils.asciiToHex('a')
-      await ansWrap.contract.methods.assignName(ansLibAddr, storageAddr, name).send({ from: OWNER, gas: 2000000 })
-      assert.equal(
-        await ansWrap.contract.methods.resolveName(ansLibAddr, storageAddr, name).call({ from: OWNER }),
-        ansWrapAddr,
-      )
+    it('assigns the name', async () => {
+      const name = 'a'
+      const test = await ansWrap.contract.methods.test(name).call()
+      console.log(test)
+
+      // await ansWrap.contract.methods.assignName(ansLibAddr, storageAddr, name)
+      //   .send({ from: OWNER, gas: 100000 })
+      // assert.equal(
+      //   await ansWrap.contract.methods.resolveName(ansLibAddr, storageAddr, name)
+      //     .call({ from: OWNER }),
+      //   ansWrapAddr,
+      // )
     })
   })
 })

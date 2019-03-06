@@ -15,7 +15,7 @@ library ANS {
     
     function assignName(
         address storageAddress,
-        bytes32 name)
+        string memory name)
         public
         validAddress(storageAddress)
         returns (bool success)
@@ -28,15 +28,15 @@ library ANS {
         }
 
         // Checks
-        bytes memory nameBytes = Utils.toBytes(name);
-        // require(nameBytes.length >= minLimit, "name must be longer than min length.");
-        // require(nameBytes.length <= NAME_MAX_LIMIT, "name must be shorter than max length.");
-        require(name[0] != 0x30 && name[1] != 0x78, "name cannot be a hex string.");
+        bytes memory nameBytes = bytes(name);
+        require(nameBytes.length >= minLimit, "name is too short.");
+        require(nameBytes.length <= NAME_MAX_LIMIT, "name is too long.");
+        require(nameBytes[0] != 0x30 && nameBytes[1] != 0x78, "name cannot be a hex string.");
         require(IANSStorage(storageAddress).resolveName(name) == address(0), "name is already taken");
 
         // Convert to lowercase
         nameBytes = Utils.toLower(nameBytes);   
-        bytes32 lowerName = Utils.toBytes32(nameBytes, 0);
+        string memory lowerName = string(nameBytes);
 
         // Call storage contract and assign the name
         return IANSStorage(storageAddress).assignName(lowerName);
@@ -57,16 +57,16 @@ library ANS {
 
     function resolveName(
         address storageAddress,
-        bytes32 name)
+        string memory name)
         public
         view
         validAddress(storageAddress)
         returns (address resolvedAddress)
     {
         // Convert to lowercase
-        bytes memory nameBytes = Utils.toBytes(name);
+        bytes memory nameBytes = bytes(name);
         nameBytes = Utils.toLower(nameBytes);
-        bytes32 lowerName = Utils.toBytes32(nameBytes, 0);
+        string memory lowerName = string(nameBytes);
 
         return IANSStorage(storageAddress).resolveName(lowerName);
     }

@@ -5,7 +5,7 @@ import "../lib/Ownable.sol";
 
 /// @title Address Name Service Storage contract
 contract ANSStorage is IANSStorage, Ownable {
-    mapping(bytes32 => address) private _nameRecords;
+    mapping(string => address) private _nameRecords;
     mapping(address => uint8) private _nameMinLimits;
 
     modifier validAddress(address _address) {
@@ -21,7 +21,7 @@ contract ANSStorage is IANSStorage, Ownable {
     ///      Only the owner of this contract can call this.
     /// @param name Name to add a name record for. 
     /// @return True if the assignment succeeds.
-    function assignName(bytes32 name) external returns (bool success) {
+    function assignName(string calldata name) external returns (bool success) {
         _nameRecords[name] = msg.sender;
         emit NameAssigned(name, msg.sender);
         return true;
@@ -39,7 +39,7 @@ contract ANSStorage is IANSStorage, Ownable {
 
     /// @param name Name to resolve to an address.
     /// @return Address associated with the name.
-    function resolveName(bytes32 name) external view returns (address resolved) {
+    function resolveName(string calldata name) external view returns (address resolved) {
         return _nameRecords[name];
     }
 

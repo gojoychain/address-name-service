@@ -1,25 +1,40 @@
 pragma solidity ^0.5.4;
 
 import "../ans/ANS.sol";
+import "../lib/Utils.sol";
 
 /// @title Address Name Service wrapper for testing
 contract ANSWrapper {
+    event Test1(uint256 indexed length);
+    event Test2(bytes32 indexed b);
+
+    function test(string memory name) public pure returns (uint256) {
+        bytes memory b = bytes(name);
+        return b.length;
+    }
+
     function assignName(
         address ansAddress,
         address storageAddress,
-        bytes32 name)
+        string memory name)
         public
     {
-        ANS.assignName(storageAddress, name);
+        // bytes32 testStr = "a";
+        // emit Test2(testStr);
+        // bytes memory byteStr = bytes(testStr);
 
-        // (bool success,) = ansAddress.delegatecall(
-        //     abi.encodePacked(
-        //         bytes4(keccak256("assignName(address,bytes32)")), 
-        //         storageAddress, 
-        //         name
-        //     )
-        // );
-        // if (!success) revert("assignName failed.");
+        // string memory str = Utils.toString(name);
+        // emit Test1(Utils.length(str));
+
+        // uint len = 0;
+        // for (uint i = 0; i < byteStr.length; i++) {
+        //     if (byteStr[i] != 0) {
+        //         len++;
+        //     }
+        // }
+        // emit Test1(len);
+
+        // ANS.assignName(storageAddress, name);
     }
 
     function setMinLimit(
@@ -30,41 +45,16 @@ contract ANSWrapper {
         public
     {
         ANS.setMinLimit(storageAddress, addr, minLimit);
-
-        // (bool success,) = ansAddress.delegatecall(
-        //     abi.encodePacked(
-        //         bytes4(keccak256("setMinLimit(address,address,uint8)")), 
-        //         storageAddress, 
-        //         addr,
-        //         minLimit
-        //     )
-        // );
-        // if (!success) revert("setMinLimit failed.");
     }
 
     function resolveName(
         address ansAddress,
         address storageAddress,
-        bytes32 name)
+        string memory name)
         public
         view
         returns (address resolvedAddress)
     {
         return ANS.resolveName(storageAddress, name);
-
-        // (bool success, bytes memory data) = ansAddress.staticcall(
-        //     abi.encodePacked(
-        //         bytes4(keccak256("resolveName(address,bytes32)")), 
-        //         storageAddress, 
-        //         name
-        //     )
-        // );
-        // if (!success) revert("resolveName failed.");
-
-        // address resolved;
-        // assembly {
-        //     resolved := mload(add(data, 20))
-        // } 
-        // return resolved;
     }
 }
