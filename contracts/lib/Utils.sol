@@ -15,4 +15,12 @@ library Utils {
         }
         return b;
     }
+
+    function toBytes(string memory s) internal pure returns (bytes memory) {
+        return bytes(s);
+    }
+
+    function toString(bytes memory b) internal pure returns (string memory) {
+        return string(b);
+    }
 }
