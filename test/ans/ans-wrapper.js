@@ -17,6 +17,7 @@ contract('ANSWrapper', (accounts) => {
   let storage, storageAddr
   let ansLib, ansLibAddr
   let ansWrap, ansWrapAddr
+  let wrapMethods
 
   beforeEach(timeMachine.snapshot)
   afterEach(timeMachine.revert)
@@ -31,24 +32,21 @@ contract('ANSWrapper', (accounts) => {
     ansWrap = await ANSWrapper.deployed({ from: OWNER, gas: MAX_GAS })
     ansWrapAddr = ansWrap.contract._address
 
+    wrapMethods = ansWrap.contract.methods
+
     console.log('storage', storageAddr)
     console.log('ansLib', ansLibAddr)
     console.log('ansWrap', ansWrapAddr)
   })
   
-  describe('assignName', () => {
+  describe.only('assignName', () => {
     it('assigns the name', async () => {
-      const name = 'a'
-      const test = await ansWrap.contract.methods.test(name).call()
-      console.log(test)
-
-      // await ansWrap.contract.methods.assignName(ansLibAddr, storageAddr, name)
-      //   .send({ from: OWNER, gas: 100000 })
-      // assert.equal(
-      //   await ansWrap.contract.methods.resolveName(ansLibAddr, storageAddr, name)
-      //     .call({ from: OWNER }),
-      //   ansWrapAddr,
-      // )
+      const name = '12345678'
+      await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+      assert.equal(
+        await wrapMethods.resolveName(storageAddr, name).call({ from: OWNER }),
+        ansWrapAddr,
+      )
     })
   })
 })

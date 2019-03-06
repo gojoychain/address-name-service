@@ -2,8 +2,8 @@ pragma solidity ^0.5.4;
 
 library Utils {
     function toLower(bytes memory b) internal pure returns (bytes memory) {
-        bytes memory lowerBytes = new bytes(32);
-        for (uint i = 0; i < 32; i++) {
+        bytes memory lowerBytes = new bytes(b.length);
+        for (uint i = 0; i < b.length; i++) {
             lowerBytes[i] = toLower(b[i]);
         }
         return lowerBytes;

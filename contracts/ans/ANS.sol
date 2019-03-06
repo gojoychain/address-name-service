@@ -29,17 +29,18 @@ library ANS {
         if (storageLimit > 0) {
             minLimit = storageLimit;
         }
-
-        // Checks
+        
+        // Convert to bytes to check length and characters
         bytes memory nameBytes = name.toBytes();
-        require(nameBytes.length >= minLimit, "name is too short.");
-        require(nameBytes.length <= NAME_MAX_LIMIT, "name is too long.");
-        require(nameBytes[0] != 0x30 && nameBytes[1] != 0x78, "name cannot be a hex string.");
-        require(IANSStorage(storageAddress).resolveName(name) == address(0), "name is already taken");
-
         // Convert to lowercase
         nameBytes = nameBytes.toLower();
         string memory lowerName = nameBytes.toString();
+
+        // Checks
+        require(nameBytes.length >= minLimit, "name is too short.");
+        require(nameBytes.length <= NAME_MAX_LIMIT, "name is too long.");
+        require(nameBytes[0] != 0x30 && nameBytes[1] != 0x78, "name cannot be a hex string.");
+        require(IANSStorage(storageAddress).resolveName(lowerName) == address(0), "name is already taken");
 
         // Call storage contract and assign the name
         return IANSStorage(storageAddress).assignName(lowerName);
