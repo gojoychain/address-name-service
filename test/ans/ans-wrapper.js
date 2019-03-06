@@ -37,16 +37,75 @@ contract('ANSWrapper', (accounts) => {
     console.log('storage', storageAddr)
     console.log('ansLib', ansLibAddr)
     console.log('ansWrap', ansWrapAddr)
+    console.log('owner', OWNER)
   })
   
   describe.only('assignName', () => {
     it('assigns the name', async () => {
       const name = '12345678'
       await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
-      assert.equal(
-        await wrapMethods.resolveName(storageAddr, name).call({ from: OWNER }),
-        ansWrapAddr,
-      )
+      assert.equal(await wrapMethods.resolveName(storageAddr, name).call(), ansWrapAddr)
+    })
+
+    it('uses the assigned min limit', async () => {
+      await wrapMethods.setMinLimit(ansLibAddr, storageAddr, ansWrapAddr, 1).send({ from: OWNER, gas: 100000 })
+
+      const name = '1'
+      assert.equal(name.length, 1)
+
+      await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+      assert.equal(await wrapMethods.resolveName(storageAddr, name).call(), ansWrapAddr)
+    })
+
+    it('converts the name to lowercase', async () => {
+      const name = 'ABCDEFGH'
+      await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+      assert.equal(await wrapMethods.resolveName(storageAddr, name).call(), ansWrapAddr)
+    })
+
+    it('throws if the name is too short', async () => {
+      const name = '1234567'
+      assert.equal(name.length, 7)
+
+      try {
+        await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+      } catch (err) {
+        sassert.revert(err)
+      }
+    })
+
+    it('throws if the name is too long', async () => {
+      const name = '123456789012345678901'
+      assert.equal(name.length, 21)
+
+      try {
+        await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+      } catch (err) {
+        sassert.revert(err)
+      }
+    })
+
+    it('throws if the name is a hex string', async () => {
+      const name = '0x1234567890'
+
+      try {
+        await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+      } catch (err) {
+        sassert.revert(err)
+      }
+    })
+
+    it('throws if the name is taken', async () => {
+      const name = '1234567890'
+
+      await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+      assert.equal(await wrapMethods.resolveName(storageAddr, name).call(), ansWrapAddr)
+
+      try {
+        await wrapMethods.assignName(storageAddr, name).send({ from: OWNER, gas: 100000 })
+      } catch (err) {
+        sassert.revert(err)
+      }
     })
   })
 })
