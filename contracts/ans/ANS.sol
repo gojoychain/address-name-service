@@ -4,7 +4,7 @@ import "../storage/IANSStorage.sol";
 import "../lib/Utils.sol";
 
 /// @title Address Name Service library
-library AddressNameService {
+library ANS {
     uint8 constant internal NAME_MIN_LIMIT = 8;
     uint8 constant internal NAME_MAX_LIMIT = 20;
 
@@ -16,7 +16,7 @@ library AddressNameService {
     function assignName(
         address storageAddress,
         bytes32 name)
-        external
+        public
         validAddress(storageAddress)
         returns (bool success)
     {
@@ -46,7 +46,7 @@ library AddressNameService {
         address storageAddress,
         address addr,
         uint8 minLimit)
-        external
+        public
         validAddress(storageAddress)
         returns (bool success)
     {
@@ -58,7 +58,7 @@ library AddressNameService {
     function resolveName(
         address storageAddress,
         bytes32 name)
-        external
+        public
         view
         validAddress(storageAddress)
         returns (address resolvedAddress)
