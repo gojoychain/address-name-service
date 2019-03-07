@@ -105,7 +105,7 @@ contract ANS is Ownable {
         external
         view
         validStorageAddress
-        returns (address resolvedAddress)
+        returns (address resolved)
     {
         // Convert to lowercase
         bytes memory nameBytes = name.toBytes();
@@ -113,5 +113,15 @@ contract ANS is Ownable {
         string memory lowerName = nameBytes.toString();
 
         return IANSStorage(_storageAddress).resolveName(lowerName);
+    }
+
+    function getMinLimit(
+        address addr)
+        external
+        view
+        validStorageAddress
+        returns (uint8 limit)
+    {
+        return IANSStorage(_storageAddress).getMinLimit(addr);
     }
 }
