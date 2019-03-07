@@ -25,6 +25,14 @@ contract('ANSStorage', (accounts) => {
     it('sets the owner of the contract', async () => {
       assert.equal(await storageMethods.owner().call(), OWNER)
     })
+
+    it('throws if the owner address is not valid', async () => {
+      try {
+        await ANSStorage.new(INVALID_ADDR, { from: OWNER, gas: MAX_GAS })
+      } catch (err) {
+        sassert.revert(err)
+      }
+    })
   })
 
   describe('assignName', () => {
