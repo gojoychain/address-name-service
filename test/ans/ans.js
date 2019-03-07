@@ -9,7 +9,7 @@ const ANS = artifacts.require('ANS')
 
 const web3 = global.web3
 
-contract('ANSWrapper', (accounts) => {
+contract('ANS', (accounts) => {
   const { OWNER, INVALID_ADDR, MAX_GAS } = getConstants(accounts)
   const timeMachine = new TimeMachine(web3)
   
