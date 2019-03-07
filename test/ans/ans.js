@@ -94,7 +94,7 @@ contract('ANS', (accounts) => {
     })
   })
   
-  describe('assignName', () => {
+  describe.only('assignName', () => {
     it('assigns the name', async () => {
       const name = '12345678'
       await ansMethods.assignName(name).send({ from: OWNER })
@@ -103,21 +103,17 @@ contract('ANS', (accounts) => {
 
     it('converts the name to lowercase', async () => {
       const name = 'ABCDEFGH'
-      await ansMethods.assignName(storageAddr, name)
-        .send({ from: OWNER, gas: 100000 })
-      assert.equal(
-        await ansMethods.resolveName(storageAddr, name).call(), 
-        ansWrapAddr,
-      )
+      await ansMethods.assignName(name).send({ from: OWNER })
+      assert.equal(await ansMethods.resolveName(name).call(), OWNER)
     })
 
-    it('throws if storageAddress is not valid', async () => {
-      const name = '1234567'
-      assert.equal(name.length, 7)
+    it('throws if storage address is not set', async () => {
+      ans = await ANS.new(OWNER, { from: OWNER, gas: MAX_GAS })
+      ansMethods = ans.contract.methods
 
+      const name = '12345678'
       try {
-        await ansMethods.assignName(INVALID_ADDR, name)
-          .send({ from: OWNER, gas: 100000 })
+        await ansMethods.assignName(name).send({ from: OWNER })
       } catch (err) {
         sassert.revert(err)
       }
@@ -128,8 +124,7 @@ contract('ANS', (accounts) => {
       assert.equal(name.length, 7)
 
       try {
-        await ansMethods.assignName(storageAddr, name)
-          .send({ from: OWNER, gas: 100000 })
+        await ansMethods.assignName(name).send({ from: OWNER })
       } catch (err) {
         sassert.revert(err)
       }
@@ -140,8 +135,7 @@ contract('ANS', (accounts) => {
       assert.equal(name.length, 21)
 
       try {
-        await ansMethods.assignName(storageAddr, name)
-          .send({ from: OWNER, gas: 100000 })
+        await ansMethods.assignName(name).send({ from: OWNER })
       } catch (err) {
         sassert.revert(err)
       }
@@ -151,8 +145,7 @@ contract('ANS', (accounts) => {
       const name = '0x1234567890'
 
       try {
-        await ansMethods.assignName(storageAddr, name)
-          .send({ from: OWNER, gas: 100000 })
+        await ansMethods.assignName(name).send({ from: OWNER })
       } catch (err) {
         sassert.revert(err)
       }
@@ -161,16 +154,11 @@ contract('ANS', (accounts) => {
     it('throws if the name is taken', async () => {
       const name = '1234567890'
 
-      await ansMethods.assignName(storageAddr, name)
-        .send({ from: OWNER, gas: 100000 })
-      assert.equal(
-        await ansMethods.resolveName(storageAddr, name).call(), 
-        ansWrapAddr,
-      )
+      await ansMethods.assignName(name).send({ from: OWNER })
+      assert.equal(await ansMethods.resolveName(name).call(), OWNER)
 
       try {
-        await ansMethods.assignName(storageAddr, name)
-          .send({ from: OWNER, gas: 100000 })
+        await ansMethods.assignName(name).send({ from: ACCT1 })
       } catch (err) {
         sassert.revert(err)
       }
