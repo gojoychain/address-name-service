@@ -40,6 +40,7 @@ contract ANSStorage is IANSStorage, Ownable {
         uint8 limit) 
         external 
         onlyOwner 
+        validAddress(addr)
         returns (bool success) 
     {
         _nameMinLimits[addr] = limit;

@@ -64,8 +64,6 @@ contract('ANSStorage', (accounts) => {
 
   describe('setMinLimit', () => {
     it('sets the limit for the specified address', async () => {
-      assert.equal(await storageMethods.owner().call(), OWNER)
-
       await storageMethods.setMinLimit(OWNER, 5).send({ from: OWNER })
       assert.equal(await storageMethods.getMinLimit(OWNER).call(), 5)
 
@@ -73,11 +71,24 @@ contract('ANSStorage', (accounts) => {
       assert.equal(await storageMethods.getMinLimit(OWNER).call(), 10)
     })
 
+    it('emits the NameLimitSet event', async () => {
+      const tx = await storageMethods.setMinLimit(OWNER, 5).send({ from: OWNER })
+      sassert.event(tx, 'NameLimitSet')
+    })
+
     it('throws if trying to call it from a non-owner', async () => {
       assert.notEqual(await storageMethods.owner().call(), ACCT1)
 
       try {
         await storageMethods.setMinLimit(ACCT1, 5).send({ from: ACCT1 })
+      } catch (err) {
+        sassert.revert(err)
+      }
+    })
+
+    it('throws if assigned address is not valid', async () => {
+      try {
+        await storageMethods.setMinLimit(INVALID_ADDR, 5).send({ from: OWNER })
       } catch (err) {
         sassert.revert(err)
       }
