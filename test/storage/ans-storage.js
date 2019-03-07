@@ -113,6 +113,7 @@ contract('ANSStorage', (accounts) => {
       await storageMethods.setMinLimit(ACCT1, 5).send({ from: OWNER })
       assert.equal(await storageMethods.getMinLimit(ACCT1).call(), 5)
 
+      assert.equal(await storageMethods.getMinLimit(ACCT2).call(), 0)
     })
   })
 })
