@@ -10,7 +10,7 @@ const ANS = artifacts.require('ANS')
 const web3 = global.web3
 
 contract('ANS', (accounts) => {
-  const { OWNER, INVALID_ADDR, MAX_GAS } = getConstants(accounts)
+  const { OWNER, ACCT1, INVALID_ADDR, MAX_GAS } = getConstants(accounts)
   const timeMachine = new TimeMachine(web3)
   
   let ans, ansAddr
@@ -45,16 +45,45 @@ contract('ANS', (accounts) => {
 
   describe('setStorageAddress', () => {
     it('sets the storage address', async () => {
+      const name = 'abc'
       try {
-        await ansMethods.resolveName(OWNER, name).call()
+        await ansMethods.resolveName(name).call()
       } catch (err) {
         sassert.revert(err)
       }
 
-      // assert.equal(await ansMethods.owner().call(), OWNER)
-      // await ansMethods.setStorageAddress(storageAddr).send({ from: OWNER })
+      assert.equal(await ansMethods.owner().call(), OWNER)
+      await ansMethods.setStorageAddress(storageAddr).send({ from: OWNER })
 
-      // assert.equal(await ansMethods.resolveName(OWNER, name).call(), INVALID_ADDR)
+      assert.equal(await ansMethods.resolveName(name).call(), INVALID_ADDR)
+    })
+
+    it('throws if trying to call it from a non-owner', async () => {
+      assert.notEqual(await ansMethods.owner().call(), ACCT1)
+
+      try {
+        await ansMethods.setStorageAddress(storageAddr).send({ from: ACCT1 })
+      } catch (err) {
+        sassert.revert(err)
+      }
+    })
+
+    it('throws if the storage address is not valid', async () => {
+      try {
+        await ansMethods.setStorageAddress(INVALID_ADDR).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err)
+      }
+    })
+
+    it('throws if the storage address is already set', async () => {
+      await ansMethods.setStorageAddress(storageAddr).send({ from: OWNER })
+
+      try {
+        await ansMethods.setStorageAddress(storageAddr).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err)
+      }
     })
   })
   
