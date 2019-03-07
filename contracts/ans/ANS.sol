@@ -37,6 +37,9 @@ contract ANS is Ownable {
         _storageAddress = addr;
     }
 
+    /// @dev Calls the storage contract and assigns the name for the msg.sender.
+    /// @param name Name to add a name record for. 
+    /// @return True if the assignment succeeds.
     function assignName(
         string calldata name)
         external
@@ -66,6 +69,10 @@ contract ANS is Ownable {
         return IANSStorage(_storageAddress).assignName(msg.sender, lowerName);
     }
 
+    /// @dev Sets the name min limit for a given address.
+    /// @param addr Address to set the limit on.
+    /// @param limit Minimum length of any future added name records.
+    /// @return True if setting the limit succeeds.
     function setMinLimit(
         address addr,
         uint8 minLimit)
@@ -79,6 +86,12 @@ contract ANS is Ownable {
         return IANSStorage(_storageAddress).setMinLimit(addr, minLimit);
     }
 
+    /// @dev Changes the storage owner.
+    ///      Changing it will remove the permissions from this contract. 
+    ///      The new owner should be another ANS contract.
+    ///      ONLY FOR PURPOSES OF UPGRADING THE ANS CONTRACT!
+    /// @param newOwner New owner of the storage contract.
+    /// @return True if changing ownership succeeds.
     function transferStorageOwnership(
         address newOwner) 
         external 
@@ -90,6 +103,10 @@ contract ANS is Ownable {
         return true;
     }
 
+    /// @dev Renounces the storage owner.
+    ///      Renouncing the owner will render the storage contract useless.
+    ///      ONLY FOR PURPOSES OF SELF-DESTRUCTING THE CONTRACT!
+    /// @return True if renouncing ownership succeeds.
     function renounceStorageOwnership() 
         external 
         onlyOwner 
@@ -100,6 +117,8 @@ contract ANS is Ownable {
         return true;
     }
 
+    /// @param name Name to resolve to an address.
+    /// @return Address associated with the name.
     function resolveName(
         string calldata name)
         external
@@ -115,6 +134,8 @@ contract ANS is Ownable {
         return IANSStorage(_storageAddress).resolveName(lowerName);
     }
 
+    /// @param addr Address to find the min limit for.
+    /// @return Min limit of name length.
     function getMinLimit(
         address addr)
         external
