@@ -27,6 +27,8 @@ contract('ANS', (accounts) => {
 
     storage = await ANSStorage.new(ansAddr, { from: OWNER, gas: MAX_GAS })
     storageAddr = storage.contract._address
+
+    await ansMethods.setStorageAddress(storageAddr).send({ from: OWNER })
   })
 
   describe('constructor', () => {
@@ -44,6 +46,11 @@ contract('ANS', (accounts) => {
   })
 
   describe('setStorageAddress', () => {
+    beforeEach(async () => {
+      ans = await ANS.new(OWNER, { from: OWNER, gas: MAX_GAS })
+      ansMethods = ans.contract.methods
+    })
+
     it('sets the storage address', async () => {
       const name = 'abc'
       try {
@@ -90,12 +97,8 @@ contract('ANS', (accounts) => {
   describe('assignName', () => {
     it('assigns the name', async () => {
       const name = '12345678'
-      await ansMethods.assignName(storageAddr, name)
-        .send({ from: OWNER, gas: 100000 })
-      assert.equal(
-        await ansMethods.resolveName(storageAddr, name).call(), 
-        ansWrapAddr,
-      )
+      await ansMethods.assignName(name).send({ from: OWNER })
+      assert.equal(await ansMethods.resolveName(name).call(), OWNER)
     })
 
     it('converts the name to lowercase', async () => {
