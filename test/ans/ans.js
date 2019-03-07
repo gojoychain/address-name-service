@@ -251,7 +251,6 @@ contract('ANS', (accounts) => {
       const name = '1'
       assert.equal(name.length, limit)
 
-      await timeMachine.mine(1)
       await ansMethods.assignName(name).send({ from: OWNER })
       assert.equal(await ansMethods.resolveName(name).call(), OWNER)
     })

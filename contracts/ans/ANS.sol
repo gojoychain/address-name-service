@@ -47,10 +47,12 @@ contract ANS is Ownable {
         returns (bool success)
     {
         // Define min limit
-        uint8 minLimit = NAME_MIN_LIMIT;
         uint8 storageLimit = IANSStorage(_storageAddress).getMinLimit(msg.sender);
-        if (storageLimit != 0) {
+        uint8 minLimit;
+        if (storageLimit > 0) {
             minLimit = storageLimit;
+        } else {
+            minLimit = NAME_MIN_LIMIT;
         }
         
         // Convert to bytes to check length and characters
