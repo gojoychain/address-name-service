@@ -1,25 +1,25 @@
 pragma solidity ^0.5.4;
 
 import "../storage/IANSStorage.sol";
+import "../lib/Ownable.sol";
 import "../lib/Utils.sol";
 
-/// @title Address Name Service library
-library ANS {
+/// @title Address Name Service contract
+contract ANS is Ownable {
     using Utils for bytes;
     using Utils for string;
 
     uint8 constant internal NAME_MIN_LIMIT = 8;
     uint8 constant internal NAME_MAX_LIMIT = 20;
 
-    modifier validAddress(address _address) {
-        require(_address != address(0), "Requires valid address.");
-        _;
+    /// @param owner Owner of the contract.
+    constructor(address owner) Ownable(owner) public validAddress(owner) {
     }
-    
+
     function assignName(
         address storageAddress,
         string memory name)
-        public
+        external
         validAddress(storageAddress)
         returns (bool success)
     {
@@ -50,7 +50,8 @@ library ANS {
         address storageAddress,
         address addr,
         uint8 minLimit)
-        public
+        external
+        onlyOwner
         validAddress(storageAddress)
         returns (bool success)
     {
@@ -62,7 +63,7 @@ library ANS {
     function resolveName(
         address storageAddress,
         string memory name)
-        public
+        external
         view
         validAddress(storageAddress)
         returns (address resolvedAddress)

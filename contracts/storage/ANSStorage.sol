@@ -8,11 +8,6 @@ contract ANSStorage is IANSStorage, Ownable {
     mapping(string => address) private _nameRecords;
     mapping(address => uint8) private _nameMinLimits;
 
-    modifier validAddress(address _address) {
-        require(_address != address(0), "Requires valid address.");
-        _;
-    }
-
     /// @param owner Owner of the contract.
     constructor(address owner) Ownable(owner) public validAddress(owner) {
     }

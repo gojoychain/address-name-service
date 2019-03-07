@@ -10,6 +10,11 @@ pragma solidity ^0.5.4;
 contract Ownable {
     address private _owner;
 
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -18,10 +23,14 @@ contract Ownable {
         _;
     }
 
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
+    /**
+     * @dev Throws if address is not valid.
+     * @param addr Address to validate.
+     */
+    modifier validAddress(address addr) {
+        require(addr != address(0), "Requires valid address.");
+        _;
+    }
 
     /**
      * @dev The Ownable constructor sets the original `owner` of the contract.
@@ -30,20 +39,6 @@ contract Ownable {
     constructor(address owner) internal {
         _owner = owner;
         emit OwnershipTransferred(address(0), _owner);
-    }
-
-    /**
-     * @return the address of the owner.
-     */
-    function owner() public view returns (address) {
-        return _owner;
-    }
-
-    /**
-     * @return true if `msg.sender` is the owner of the contract.
-     */
-    function isOwner() public view returns (bool) {
-        return msg.sender == _owner;
     }
 
     /**
@@ -66,5 +61,19 @@ contract Ownable {
     function renounceOwnership() public onlyOwner {
         emit OwnershipTransferred(_owner, address(0));
         _owner = address(0);
+    }
+
+    /**
+     * @return the address of the owner.
+     */
+    function owner() public view returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @return true if `msg.sender` is the owner of the contract.
+     */
+    function isOwner() public view returns (bool) {
+        return msg.sender == _owner;
     }
 }
