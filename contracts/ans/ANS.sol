@@ -23,6 +23,20 @@ contract ANS is Ownable {
     constructor(address owner) Ownable(owner) public validAddress(owner) {
     }
 
+    /// @dev Sets the storage address and enables all other functions.
+    ///      All other functions rely on a valid storage contract address
+    ///      so this function needs to be called first.
+    /// @param addr Address of the storage contract.
+    function setStorageAddress(
+        address addr) 
+        external 
+        onlyOwner
+        validAddress(addr) 
+    {
+        require(_storageAddress == address(0), "Storage address already set.");
+        _storageAddress = addr;
+    }
+
     function assignName(
         string calldata name)
         external
