@@ -169,8 +169,6 @@ contract('ANS', (accounts) => {
   })
   
   describe('setMinLimit', () => {
-    // TODO: expected fail. assignName after setMinLimit not getting the set limit.
-    // something with msg.sender calling from ANSWrapper is not same address.
     it('sets the name min limit of an address', async () => {
       assert.equal(await ansMethods.owner().call(), OWNER)
 
@@ -225,32 +223,24 @@ contract('ANS', (accounts) => {
   describe('resolveName', () => {
     it('resolves the name', async () => {
       const name = '12345678'
-      await ansMethods.assignName(storageAddr, name)
-        .send({ from: OWNER, gas: 100000 })
-      assert.equal(
-        await ansMethods.resolveName(storageAddr, name).call(), 
-        ansWrapAddr,
-      )
+      await ansMethods.assignName(name).send({ from: OWNER })
+      assert.equal(await ansMethods.resolveName(name).call(), OWNER)
     })
 
     it('converts the name to lowercase', async () => {
       let name = 'abcdefgh'
-      await ansMethods.assignName(storageAddr, name)
-        .send({ from: OWNER, gas: 100000 })
+      await ansMethods.assignName(name).send({ from: OWNER })
 
       name = 'ABCDEFGH'
-      assert.equal(
-        await ansMethods.resolveName(storageAddr, name).call(),
-        ansWrapAddr,
-      )
+      assert.equal(await ansMethods.resolveName(name).call(), OWNER)
     })
 
-    it('throws if storageAddress is not valid', async () => {
-      const name = '12345678'
-      await ansMethods.assignName(storageAddr, name)
-        .send({ from: OWNER, gas: 100000 })
+    it('throws if storage address is not set', async () => {
+      ans = await ANS.new(OWNER, { from: OWNER, gas: MAX_GAS })
+      ansMethods = ans.contract.methods
+      
       try {
-        await ansMethods.resolveName(INVALID_ADDR, name).call()
+        await ansMethods.resolveName('abc').call()
       } catch (err) {
         sassert.revert(err)
       }
