@@ -256,6 +256,42 @@ contract('ANS', (accounts) => {
     })
   })
 
+  describe('renounceStorageOwnership', () => {
+    it('should renounce the storage owner', async () => {
+      assert.equal(await storage.contract.methods.owner().call(), ansAddr)
+
+      await ansMethods.renounceStorageOwnership().send({ from: OWNER })
+      assert.equal(await storage.contract.methods.owner().call(), INVALID_ADDR)
+
+      try {
+        await ansMethods.assignName('helloworld').send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, ERR_ONLY_OWNER)
+      }
+    })
+
+    it('throws if trying to call it from a non-owner', async () => {
+      assert.notEqual(await ansMethods.owner().call(), ACCT1)
+
+      try {
+        await ansMethods.renounceStorageOwnership().send({ from: ACCT1 })
+      } catch (err) {
+        sassert.revert(err, ERR_ONLY_OWNER)
+      }
+    })
+
+    it('throws if storage address is not set', async () => {
+      ans = await ANS.new(OWNER, { from: OWNER, gas: MAX_GAS })
+      ansMethods = ans.contract.methods
+      
+      try {
+        await ansMethods.renounceStorageOwnership().send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, ERR_STORAGE_NOT_SET)
+      }
+    })
+  })
+
   describe('resolveName', () => {
     it('resolves the name', async () => {
       const name = '12345678'
