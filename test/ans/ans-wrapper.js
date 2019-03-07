@@ -6,7 +6,6 @@ const getConstants = require('../constants')
 
 const ANSStorage = artifacts.require('ANSStorage')
 const ANS = artifacts.require('ANS')
-const ANSWrapper = artifacts.require('ANSWrapper')
 
 const web3 = global.web3
 

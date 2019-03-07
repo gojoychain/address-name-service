@@ -24,7 +24,7 @@ contract ANS is Ownable {
     }
 
     function assignName(
-        string memory name)
+        string calldata name)
         external
         validStorageAddress
         returns (bool success)
@@ -87,7 +87,7 @@ contract ANS is Ownable {
     }
 
     function resolveName(
-        string memory name)
+        string calldata name)
         external
         view
         validStorageAddress
