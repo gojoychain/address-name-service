@@ -1,6 +1,10 @@
 pragma solidity ^0.5.4;
 
 library Utils {
+    function validateNotHex(bytes memory b) internal pure returns (bool) {
+        return b[0] != 0x30 && b[1] != 0x78;
+    }
+    
     function toLower(bytes memory b) internal pure returns (bytes memory) {
         bytes memory lowerBytes = new bytes(b.length);
         for (uint i = 0; i < b.length; i++) {

@@ -62,7 +62,7 @@ contract ANS is Ownable {
         // Checks
         require(nameBytes.length >= minLimit, "name is too short.");
         require(nameBytes.length <= NAME_MAX_LIMIT, "name is too long.");
-        require(nameBytes[0] != 0x30 && nameBytes[1] != 0x78, "name cannot be a hex string.");
+        require(nameBytes.validateNotHex(), "name cannot be a hex string.");
         require(IANSStorage(_storageAddress).resolveName(lowerName) == address(0), "name is already taken.");
 
         // Call storage contract and assign the name
@@ -71,7 +71,7 @@ contract ANS is Ownable {
 
     /// @dev Sets the name min limit for a given address.
     /// @param addr Address to set the limit on.
-    /// @param limit Minimum length of any future added name records.
+    /// @param minLimit Minimum length of any future added name records.
     /// @return True if setting the limit succeeds.
     function setMinLimit(
         address addr,
