@@ -15,7 +15,7 @@ contract ANS is Ownable {
     address internal _storageAddress;
 
     modifier validStorageAddress() {
-        require(_storageAddress != address(0), "Storage address has not be set.");
+        require(_storageAddress != address(0), "Storage address not set.");
         _;
     }
 
@@ -60,7 +60,7 @@ contract ANS is Ownable {
         require(nameBytes.length >= minLimit, "name is too short.");
         require(nameBytes.length <= NAME_MAX_LIMIT, "name is too long.");
         require(nameBytes[0] != 0x30 && nameBytes[1] != 0x78, "name cannot be a hex string.");
-        require(IANSStorage(_storageAddress).resolveName(lowerName) == address(0), "name is already taken");
+        require(IANSStorage(_storageAddress).resolveName(lowerName) == address(0), "name is already taken.");
 
         // Call storage contract and assign the name
         return IANSStorage(_storageAddress).assignName(msg.sender, lowerName);

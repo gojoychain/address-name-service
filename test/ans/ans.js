@@ -11,6 +11,9 @@ const web3 = global.web3
 
 contract('ANS', (accounts) => {
   const { OWNER, ACCT1, INVALID_ADDR, MAX_GAS } = getConstants(accounts)
+  const ERR_ONLY_OWNER = 'Owner is only allowed to call this method.'
+  const ERR_VALID_ADDRESS = 'Requires valid address.'
+  const ERR_STORAGE_NOT_SET = 'Storage address not set.'
   const timeMachine = new TimeMachine(web3)
   
   let ans, ansAddr
@@ -40,7 +43,7 @@ contract('ANS', (accounts) => {
       try {
         await ANS.new(INVALID_ADDR, { from: OWNER, gas: MAX_GAS })
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, ERR_VALID_ADDRESS)
       }
     })
   })
@@ -56,7 +59,7 @@ contract('ANS', (accounts) => {
       try {
         await ansMethods.resolveName(name).call()
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, ERR_STORAGE_NOT_SET)
       }
 
       assert.equal(await ansMethods.owner().call(), OWNER)
@@ -71,7 +74,7 @@ contract('ANS', (accounts) => {
       try {
         await ansMethods.setStorageAddress(storageAddr).send({ from: ACCT1 })
       } catch (err) {
-        sassert.revert(err, 'Owner is only allowed to call this method.')
+        sassert.revert(err, ERR_ONLY_OWNER)
       }
     })
 
@@ -79,7 +82,7 @@ contract('ANS', (accounts) => {
       try {
         await ansMethods.setStorageAddress(INVALID_ADDR).send({ from: OWNER })
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, ERR_VALID_ADDRESS)
       }
     })
 
@@ -89,7 +92,7 @@ contract('ANS', (accounts) => {
       try {
         await ansMethods.setStorageAddress(storageAddr).send({ from: OWNER })
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, 'Storage address already set.')
       }
     })
   })
@@ -115,7 +118,7 @@ contract('ANS', (accounts) => {
       try {
         await ansMethods.assignName(name).send({ from: OWNER })
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, ERR_STORAGE_NOT_SET)
       }
     })
     
@@ -126,7 +129,7 @@ contract('ANS', (accounts) => {
       try {
         await ansMethods.assignName(name).send({ from: OWNER })
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, 'name is too short.')
       }
     })
 
@@ -137,7 +140,7 @@ contract('ANS', (accounts) => {
       try {
         await ansMethods.assignName(name).send({ from: OWNER })
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, 'name is too long.')
       }
     })
 
@@ -147,7 +150,7 @@ contract('ANS', (accounts) => {
       try {
         await ansMethods.assignName(name).send({ from: OWNER })
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, 'name cannot be a hex string.')
       }
     })
 
@@ -160,7 +163,7 @@ contract('ANS', (accounts) => {
       try {
         await ansMethods.assignName(name).send({ from: ACCT1 })
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, 'name is already taken.')
       }
     })
   })
@@ -189,7 +192,7 @@ contract('ANS', (accounts) => {
       try {
         await ansMethods.setMinLimit(OWNER, 1).send({ from: ACCT1 })
       } catch (err) {
-        sassert.revert(err, 'Owner is only allowed to call this method.')
+        sassert.revert(err, ERR_ONLY_OWNER)
       }
     })
 
@@ -200,7 +203,7 @@ contract('ANS', (accounts) => {
       try {
         await ansMethods.setMinLimit(OWNER, 1).send({ from: OWNER })
       } catch (err) {
-        sassert.revert(err, 'Storage address has not be set.')
+        sassert.revert(err, ERR_STORAGE_NOT_SET)
       }
     })
 
