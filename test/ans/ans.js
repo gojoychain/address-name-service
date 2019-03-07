@@ -71,7 +71,7 @@ contract('ANS', (accounts) => {
       try {
         await ansMethods.setStorageAddress(storageAddr).send({ from: ACCT1 })
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, 'Owner is only allowed to call this method.')
       }
     })
 
@@ -94,7 +94,7 @@ contract('ANS', (accounts) => {
     })
   })
   
-  describe.only('assignName', () => {
+  describe('assignName', () => {
     it('assigns the name', async () => {
       const name = '12345678'
       await ansMethods.assignName(name).send({ from: OWNER })
@@ -169,42 +169,52 @@ contract('ANS', (accounts) => {
     // TODO: expected fail. assignName after setMinLimit not getting the set limit.
     // something with msg.sender calling from ANSWrapper is not same address.
     it('sets the name min limit of an address', async () => {
-      await ansMethods.setMinLimit(storageAddr, ansWrapAddr, 1)
-        .send({ from: OWNER, gas: 100000 })
+      assert.equal(await ansMethods.owner().call(), OWNER)
+
+      const limit = 1
+      await ansMethods.setMinLimit(OWNER, limit).send({ from: OWNER })
+      assert.equal(await ansMethods.getMinLimit(OWNER).call(), limit)
 
       const name = '1'
-      assert.equal(name.length, 1)
+      assert.equal(name.length, limit)
 
-      await ansMethods.assignName(storageAddr, name)
-        .send({ from: OWNER, gas: 100000 })
-      assert.equal(
-        await ansMethods.resolveName(storageAddr, name).call(), 
-        ansWrapAddr,
-      )
+      await timeMachine.mine(1)
+      await ansMethods.assignName(name).send({ from: OWNER })
+      assert.equal(await ansMethods.resolveName(name).call(), OWNER)
     })
 
-    it('throws if storageAddress is not valid', async () => {
+    it('throws if trying to call it from a non-owner', async () => {
+      assert.notEqual(await ansMethods.owner().call(), ACCT1)
+
       try {
-        await ansMethods.setMinLimit(storageAddr, ansWrapAddr, 1)
-          .send({ from: OWNER, gas: 100000 })
+        await ansMethods.setMinLimit(OWNER, 1).send({ from: ACCT1 })
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, 'Owner is only allowed to call this method.')
+      }
+    })
+
+    it('throws if storage address is not set', async () => {
+      ans = await ANS.new(OWNER, { from: OWNER, gas: MAX_GAS })
+      ansMethods = ans.contract.methods
+
+      try {
+        await ansMethods.setMinLimit(OWNER, 1).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, 'Storage address has not be set.')
       }
     })
 
     it('throws if the minLimit is not within the allowable range', async () => {
       try {
-        await ansMethods.setMinLimit(storageAddr, ansWrapAddr, 0)
-          .send({ from: OWNER, gas: 100000 })
+        await ansMethods.setMinLimit(OWNER, 0).send({ from: OWNER })
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, 'minLength must be between 1 and 8.')
       }
 
       try {
-        await ansMethods.setMinLimit(storageAddr, ansWrapAddr, 9)
-          .send({ from: OWNER, gas: 100000 })
+        await ansMethods.setMinLimit(OWNER, 9).send({ from: OWNER })
       } catch (err) {
-        sassert.revert(err)
+        sassert.revert(err, 'minLength must be between 1 and 8.')
       }
     })
   })
