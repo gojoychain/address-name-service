@@ -63,7 +63,14 @@ contract ANS is Ownable {
         require(nameBytes.length >= minLimit, "name is too short.");
         require(nameBytes.length <= NAME_MAX_LIMIT, "name is too long.");
         require(nameBytes.validateNotHex(), "name cannot be a hex string.");
-        require(IANSStorage(_storageAddress).resolveName(lowerName) == address(0), "name is already taken.");
+        require(
+            nameBytes.validateLettersAndNumbers(), 
+            "name contains invalid characters."
+        );
+        require(
+            IANSStorage(_storageAddress).resolveName(lowerName) == address(0), 
+            "name is already taken."
+        );
 
         // Call storage contract and assign the name
         return IANSStorage(_storageAddress).assignName(msg.sender, lowerName);
@@ -81,7 +88,10 @@ contract ANS is Ownable {
         validStorageAddress
         returns (bool success)
     {
-        require(minLimit >= 1 && minLimit <= NAME_MIN_LIMIT, "minLength must be between 1 and 8.");
+        require(
+            minLimit >= 1 && minLimit <= NAME_MIN_LIMIT, 
+            "minLength must be between 1 and 8."
+        );
 
         return IANSStorage(_storageAddress).setMinLimit(addr, minLimit);
     }

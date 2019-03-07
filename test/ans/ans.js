@@ -154,6 +154,78 @@ contract('ANS', (accounts) => {
       }
     })
 
+    it('throws if the name contains invalid characters', async () => {
+      let name = '12345678!'
+      try {
+        await ansMethods.assignName(name).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, 'name contains invalid characters.')
+      }
+
+      name = '12345678@'
+      try {
+        await ansMethods.assignName(name).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, 'name contains invalid characters.')
+      }
+
+      name = '12345678#'
+      try {
+        await ansMethods.assignName(name).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, 'name contains invalid characters.')
+      }
+
+      name = '12345678$'
+      try {
+        await ansMethods.assignName(name).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, 'name contains invalid characters.')
+      }
+
+      name = '12345678%'
+      try {
+        await ansMethods.assignName(name).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, 'name contains invalid characters.')
+      }
+
+      name = '12345678^'
+      try {
+        await ansMethods.assignName(name).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, 'name contains invalid characters.')
+      }
+
+      name = '12345678&'
+      try {
+        await ansMethods.assignName(name).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, 'name contains invalid characters.')
+      }
+
+      name = '12345678*'
+      try {
+        await ansMethods.assignName(name).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, 'name contains invalid characters.')
+      }
+
+      name = '12345678('
+      try {
+        await ansMethods.assignName(name).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, 'name contains invalid characters.')
+      }
+
+      name = '12345678)'
+      try {
+        await ansMethods.assignName(name).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, 'name contains invalid characters.')
+      }
+    })
+
     it('throws if the name is taken', async () => {
       const name = '1234567890'
 
