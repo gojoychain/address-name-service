@@ -9,4 +9,6 @@ contract IANSStorage {
     function setMinLimit(address addr, uint8 limit) external returns (bool success);
     function resolveName(string calldata name) external view returns (address resolved);
     function getMinLimit(address addr) external view returns (uint8 limit);
+    function transferOwnership(address newOwner) public;
+    function renounceOwnership() public;
 }

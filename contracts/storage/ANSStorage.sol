@@ -21,7 +21,12 @@ contract ANSStorage is IANSStorage, Ownable {
     ///      Only the owner of this contract can call this.
     /// @param name Name to add a name record for. 
     /// @return True if the assignment succeeds.
-    function assignName(string calldata name) external returns (bool success) {
+    function assignName(
+        string calldata name) 
+        external 
+        onlyOwner 
+        returns (bool success) 
+    {
         _nameRecords[name] = msg.sender;
         emit NameAssigned(name, msg.sender);
         return true;
@@ -32,7 +37,13 @@ contract ANSStorage is IANSStorage, Ownable {
     /// @param addr Address to set the limit on.
     /// @param limit Minimum length of any future added name records.
     /// @return True if setting the limit succeeds.
-    function setMinLimit(address addr, uint8 limit) external onlyOwner returns (bool success) {
+    function setMinLimit(
+        address addr, 
+        uint8 limit) 
+        external 
+        onlyOwner 
+        returns (bool success) 
+    {
         _nameMinLimits[addr] = limit;
         emit NameLimitSet(addr, limit);
         return true;
@@ -40,13 +51,23 @@ contract ANSStorage is IANSStorage, Ownable {
 
     /// @param name Name to resolve to an address.
     /// @return Address associated with the name.
-    function resolveName(string calldata name) external view returns (address resolved) {
+    function resolveName(
+        string calldata name) 
+        external 
+        view 
+        returns (address resolved) 
+    {
         return _nameRecords[name];
     }
 
     /// @param addr Address to find the min limit for.
     /// @return Min limit of name length.
-    function getMinLimit(address addr) external view returns (uint8 limit) {
+    function getMinLimit(
+        address addr) 
+        external 
+        view 
+        returns (uint8 limit) 
+    {
         return _nameMinLimits[addr];
     }
 }
