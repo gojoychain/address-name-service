@@ -11,15 +11,17 @@ contract('ANSStorage', (accounts) => {
   const { OWNER, ACCT1, ACCT2, INVALID_ADDR, MAX_GAS } = getConstants(accounts)
   const timeMachine = new TimeMachine(web3)
   
-  let storage
-  let storageMethods
+  let storage, storageMethods
 
   beforeEach(timeMachine.snapshot)
   afterEach(timeMachine.revert)
 
   beforeEach(async () => {
-    storage = await ANSStorage.deployed(OWNER, { from: OWNER, gas: MAX_GAS })
+    storage = await ANSStorage.new(OWNER, { from: OWNER, gas: MAX_GAS })
     storageMethods = storage.contract.methods
+
+    console.log('storage', storage.contract._address)
+    console.log('owner', OWNER)
   })
   
   describe('constructor', () => {
