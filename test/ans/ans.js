@@ -246,4 +246,23 @@ contract('ANS', (accounts) => {
       }
     })
   })
+
+  describe('getMinLimit', () => {
+    it('gets the min limit', async () => {
+      const limit = 1
+      await ansMethods.setMinLimit(OWNER, limit).send({ from: OWNER })
+      assert.equal(await ansMethods.getMinLimit(OWNER).call(), limit)
+    })
+
+    it('throws if storage address is not set', async () => {
+      ans = await ANS.new(OWNER, { from: OWNER, gas: MAX_GAS })
+      ansMethods = ans.contract.methods
+      
+      try {
+        await ansMethods.getMinLimit(OWNER).call()
+      } catch (err) {
+        sassert.revert(err)
+      }
+    })
+  })
 })
