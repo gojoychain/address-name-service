@@ -65,6 +65,27 @@ contract ANS is Ownable {
         return IANSStorage(_storageAddress).setMinLimit(addr, minLimit);
     }
 
+    function transferStorageOwnership(
+        address newOwner) 
+        external 
+        onlyOwner 
+        validStorageAddress 
+        returns (bool success) 
+    {
+        IANSStorage(_storageAddress).transferOwnership(newOwner);
+        return true;
+    }
+
+    function renounceStorageOwnership() 
+        external 
+        onlyOwner 
+        validStorageAddress 
+        returns (bool success) 
+    {
+        IANSStorage(_storageAddress).renounceOwnership();
+        return true;
+    }
+
     function resolveName(
         string memory name)
         external
