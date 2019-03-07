@@ -14,16 +14,18 @@ contract ANSStorage is IANSStorage, Ownable {
 
     /// @dev Note the validation of the name should happen in the library contract.
     ///      Only the owner of this contract can call this.
+    /// @param addr Address to set the name for.
     /// @param name Name to add a name record for. 
     /// @return True if the assignment succeeds.
     function assignName(
-        string calldata name) 
+        address addr,
+        string calldata name)
         external 
         onlyOwner 
         returns (bool success) 
     {
-        _nameRecords[name] = msg.sender;
-        emit NameAssigned(name, msg.sender);
+        _nameRecords[name] = addr;
+        emit NameAssigned(name, addr);
         return true;
     }
 

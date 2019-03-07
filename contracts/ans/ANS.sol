@@ -49,7 +49,7 @@ contract ANS is Ownable {
         require(IANSStorage(_storageAddress).resolveName(lowerName) == address(0), "name is already taken");
 
         // Call storage contract and assign the name
-        return IANSStorage(_storageAddress).assignName(lowerName);
+        return IANSStorage(_storageAddress).assignName(msg.sender, lowerName);
     }
 
     function setMinLimit(

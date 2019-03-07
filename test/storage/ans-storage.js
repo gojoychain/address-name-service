@@ -19,9 +19,6 @@ contract('ANSStorage', (accounts) => {
   beforeEach(async () => {
     storage = await ANSStorage.new(OWNER, { from: OWNER, gas: MAX_GAS })
     storageMethods = storage.contract.methods
-
-    console.log('storage', storage.contract._address)
-    console.log('owner', OWNER)
   })
   
   describe('constructor', () => {
@@ -33,12 +30,22 @@ contract('ANSStorage', (accounts) => {
   describe('assignName', () => {
     it('assigns the name for the senders address', async () => {
       let name = 'hello'
-      await storageMethods.assignName(name).send({ from: OWNER })
+      await storageMethods.assignName(OWNER, name).send({ from: OWNER })
       assert.equal(await storageMethods.resolveName(name).call(), OWNER)
 
       name = 'world'
-      await storageMethods.assignName(name).send({ from: OWNER })
+      await storageMethods.assignName(OWNER, name).send({ from: OWNER })
       assert.equal(await storageMethods.resolveName(name).call(), OWNER)
+    })
+
+    it('throws if trying to call it from a non-owner', async () => {
+      assert.notEqual(await storageMethods.owner().call(), ACCT1)
+
+      try {
+        await storageMethods.assignName(ACCT1, 'abc').send({ from: ACCT1 })
+      } catch (err) {
+        sassert.revert(err)
+      }
     })
   })
 
