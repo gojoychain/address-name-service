@@ -22,6 +22,7 @@ contract ANSStorage is IANSStorage, Ownable {
         string calldata name)
         external 
         onlyOwner 
+        validAddress(addr)
         returns (bool success) 
     {
         _nameRecords[name] = addr;

@@ -38,11 +38,24 @@ contract('ANSStorage', (accounts) => {
       assert.equal(await storageMethods.resolveName(name).call(), OWNER)
     })
 
+    it('emits the NameAssigned event', async () => {
+      const tx = await storageMethods.assignName(OWNER, 'name').send({ from: OWNER })
+      sassert.event(tx, 'NameAssigned')
+    })
+
     it('throws if trying to call it from a non-owner', async () => {
       assert.notEqual(await storageMethods.owner().call(), ACCT1)
 
       try {
         await storageMethods.assignName(ACCT1, 'abc').send({ from: ACCT1 })
+      } catch (err) {
+        sassert.revert(err)
+      }
+    })
+
+    it('throws if assigned address is not valid', async () => {
+      try {
+        await storageMethods.assignName(INVALID_ADDR, 'def').send({ from: OWNER })
       } catch (err) {
         sassert.revert(err)
       }
@@ -61,6 +74,8 @@ contract('ANSStorage', (accounts) => {
     })
 
     it('throws if trying to call it from a non-owner', async () => {
+      assert.notEqual(await storageMethods.owner().call(), ACCT1)
+
       try {
         await storageMethods.setMinLimit(ACCT1, 5).send({ from: ACCT1 })
       } catch (err) {
@@ -72,7 +87,7 @@ contract('ANSStorage', (accounts) => {
   describe('resolveName', () => {
     it('returns the resolved address', async () => {
       let name = 'hello'
-      await storageMethods.assignName(name).send({ from: OWNER })
+      await storageMethods.assignName(OWNER, name).send({ from: OWNER })
       assert.equal(await storageMethods.resolveName(name).call(), OWNER)
 
       name = 'world'
@@ -82,10 +97,11 @@ contract('ANSStorage', (accounts) => {
 
   describe('getMinLimit', () => {
     it('returns the min limit', async () => {
+      assert.equal(await storageMethods.getMinLimit(ACCT1).call(), 0)
+
       await storageMethods.setMinLimit(ACCT1, 5).send({ from: OWNER })
       assert.equal(await storageMethods.getMinLimit(ACCT1).call(), 5)
 
-      assert.equal(await storageMethods.getMinLimit(ACCT2).call(), 0)
     })
   })
 })
