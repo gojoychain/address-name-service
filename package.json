@@ -1,0 +1,31 @@
+{
+  "name": "address-name-service",
+  "version": "1.0.0",
+  "description": "Contract that resolves human readable names and translates to native addresses",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ghuchain/address-name-service.git"
+  },
+  "author": "Deric Walintukan <deric@ghuchain.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ghuchain/address-name-service/issues"
+  },
+  "homepage": "https://github.com/ghuchain/address-name-service#readme",
+  "devDependencies": {
+    "bluebird": "^3.5.3",
+    "chai": "^4.2.0",
+    "sol-assert": "^1.1.1",
+    "sol-time-machine": "^1.0.0"
+  },
+  "dependencies": {
+    "truffle-hdwallet-provider": "^1.0.5"
+  }
+}
