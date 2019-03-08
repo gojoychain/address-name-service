@@ -155,6 +155,10 @@ contract ANS is Ownable {
         validStorageAddress
         returns (uint8 limit)
     {
-        return IANSStorage(_storageAddress).getMinLimit(addr);
+        uint8 limit = IANSStorage(_storageAddress).getMinLimit(addr);
+        if (limit > 0) {
+            return limit;
+        }
+        return NAME_MIN_LIMIT;
     }
 }
