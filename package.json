@@ -24,5 +24,8 @@
     "chai": "^4.2.0",
     "sol-assert": "^1.1.1",
     "sol-time-machine": "^1.0.0"
+  },
+  "dependencies": {
+    "truffle-hdwallet-provider": "^1.0.5"
   }
 }
