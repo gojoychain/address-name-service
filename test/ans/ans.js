@@ -397,6 +397,10 @@ contract('ANS', (accounts) => {
       assert.equal(await ansMethods.getMinLimit(OWNER).call(), limit)
     })
 
+    it('returns the default min limit if none is set', async () => {
+      assert.equal(await ansMethods.getMinLimit(OWNER).call(), 8)
+    })
+
     it('throws if storage address is not set', async () => {
       ans = await ANS.new(OWNER, { from: OWNER, gas: MAX_GAS })
       ansMethods = ans.contract.methods
