@@ -10,7 +10,7 @@ const ANS = artifacts.require('ANS')
 const web3 = global.web3
 
 contract('ANS', (accounts) => {
-  const { OWNER, ACCT1, INVALID_ADDR, MAX_GAS } = getConstants(accounts)
+  const { OWNER, ACCT1, ACCT2, ACCT3, INVALID_ADDR, MAX_GAS } = getConstants(accounts)
   const ERR_ONLY_OWNER = 'Owner is only allowed to call this method.'
   const ERR_VALID_ADDRESS = 'Requires valid address.'
   const ERR_STORAGE_NOT_SET = 'Storage address not set.'
@@ -99,9 +99,21 @@ contract('ANS', (accounts) => {
   
   describe('assignName', () => {
     it('assigns the name', async () => {
-      const name = '12345678'
+      let name = '12345678'
       await ansMethods.assignName(name).send({ from: OWNER })
       assert.equal(await ansMethods.resolveName(name).call(), OWNER)
+
+      name = 'ABCDEFGH'
+      await ansMethods.assignName(name).send({ from: ACCT1 })
+      assert.equal(await ansMethods.resolveName(name).call(), ACCT1)
+
+      name = '1a2b3c4d'
+      await ansMethods.assignName(name).send({ from: ACCT2 })
+      assert.equal(await ansMethods.resolveName(name).call(), ACCT2)
+
+      name = 'a1b2c3d4'
+      await ansMethods.assignName(name).send({ from: ACCT3 })
+      assert.equal(await ansMethods.resolveName(name).call(), ACCT3)
     })
 
     it('converts the name to lowercase', async () => {
@@ -219,6 +231,13 @@ contract('ANS', (accounts) => {
       }
 
       name = '12345678)'
+      try {
+        await ansMethods.assignName(name).send({ from: OWNER })
+      } catch (err) {
+        sassert.revert(err, 'name contains invalid characters.')
+      }
+
+      name = '12345678 '
       try {
         await ansMethods.assignName(name).send({ from: OWNER })
       } catch (err) {
